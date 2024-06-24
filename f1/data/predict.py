@@ -48,7 +48,50 @@ for name, df in dataframes.items():
 #     print(df.head())
 
 # Display the number of missing values in each column for each DataFrame
-for name, df in dataframes.items():
-    print(f"--- Missing values in {name} ---")
-    print(df.isnull().sum())
-    print("\n")
+
+
+# Fill missing values in qualifying dataset with 0
+dataframes['qualifying'] = dataframes['qualifying'].fillna(0)
+# for name, df in dataframes.items():
+#     print(f"--- Missing values in {name} ---")
+#     print(df.isnull().sum())
+#     print("\n")
+
+# Calculate driver experience
+
+##   creating features for  drivers to maximise model efficiency ##
+results['driver_experience'] = results.groupby('driverid')['raceid'].transform('nunique')
+
+driver_experience = results[['driverid', 'driver_experience']].drop_duplicates()
+# print(driver_experience.head())
+# for name, df in dataframes.items():
+
+    
+#     print(df.head())
+
+##        fixing "/N" values in position databse
+results['position'] = pd.to_numeric(results['position'], errors='coerce')
+# Replace NaN values with 0
+results['position'] = results['position'].fillna(0)
+
+
+
+results['average_points'] = results.groupby('driverid')['points'].transform('mean')
+
+results['total_wins'] = results.groupby('driverid')['position'].transform(lambda x: (x == 1).sum())
+results['average_finish_position'] = results.groupby('driverid')['position'].transform('mean')
+
+
+results['constructor_experience'] = results.groupby('constructorid')['raceid'].transform('nunique')
+results['average_constructor_points'] = results.groupby('constructorid')['points'].transform('mean')
+
+results['total_constructor_wins'] = results.groupby('constructorid')['position'].transform(lambda x: (x == 1).sum())
+
+results['total_constructor_wins'] = results.groupby('constructorid')['position'].transform(lambda x: (x == 1).sum())
+
+
+pit_stops['pit_stops_count'] = pit_stops.groupby(['raceid', 'driverid'])['stop'].transform('count')
+
+# error in position values
+
+# Check for non-numeric values in the 'position' column
